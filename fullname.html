@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DAO Voting Pattern Analyzer</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #fff;
+    }
+    h2 {
+      color: #333;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #f3f3f3;
+    }
+    #chartContainer {
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>DAO Voting Pattern Table</h2>
+
+  <table id="votingTable">
+    <thead>
+      <tr>
+        <th>Address</th>
+        <th>Voting Power</th>
+        <th>Public Key Bytes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Dynamic content will be added here -->
+    </tbody>
+  </table>
+
+  <div id="chartContainer">
+    <h3>Voting Power Chart</h3>
+    <canvas id="votingChart" width="400" height="200"></canvas>
+  </div>
+
+  <script>
+    async function fetchData() {
+      try {
+        // MOCK DATA (replace with real API once available)
+        const mockData = [
+          { addr: "0xabc123", voting_power: "1500", pk_bytes: "0xabc" },
+          { addr: "0xdef456", voting_power: "2300", pk_bytes: "0xdef" },
+          { addr: "0x789aaa", voting_power: "900", pk_bytes: "0x789" }
+        ];
+
+        console.log("Mock Data:", mockData);
+        displayTable(mockData);
+        drawChart(mockData);
+      } catch (error) {
+        console.error("Error loading data:", error);
+      }
+    }
+
+    function displayTable(data) {
+      const tableBody = document.querySelector("#votingTable tbody");
+      tableBody.innerHTML = "";
+
+      data.forEach(voter => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${voter.addr}</td>
+          <td>${voter.voting_power}</td>
+          <td>${voter.pk_bytes}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    function drawChart(data) {
+      const ctx = document.getElementById("votingChart").getContext("2d");
+
+      const addresses = data.map(voter => voter.addr);
+      const powers = data.map(voter => parseInt(voter.voting_power));
+
+      new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: addresses,
+          datasets: [{
+            label: "Voting Power",
+            data: powers,
+            backgroundColor: "#A86DFF"
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+
+    // Initial fetch
+    fetchData();
+  </script>
+
+</body>
+</html>

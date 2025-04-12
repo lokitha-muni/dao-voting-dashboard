@@ -1,0 +1,19 @@
+[
+    {
+        "type": "0x1::dkg::DKGState",
+        "data": {
+            "in_progress": {
+                "vec": []
+            },
+            "last_completed": {
+                "vec": [
+                    {
+                        "metadata": {
+                            "dealer_epoch": "11004"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+]
