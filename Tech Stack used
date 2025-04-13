@@ -1,0 +1,34 @@
+### **Tech Stack Used:**
+
+1. **Aptos Blockchain:**
+   - **Description:** The project utilizes the **Aptos blockchain** to fetch and analyze historical voting data from DAOs.
+   Aptos is known for its scalability and security, making it ideal for building decentralized applications (dApps).
+   - **Role in Project:** The Aptos blockchain will provide access to DAO voting records via smart contracts and APIs, enabling the extraction of voting history and participation data.
+
+2. **Python (Flask/Django):**
+   - **Description:** **Python** will be used for the back-end development, handling data processing, integration with the Aptos API, and analysis of the voting patterns.
+   - **Role in Project:** Python facilitates data handling and processing. Flask or Django can be used to build the web application’s back-end, handling API requests and rendering the dashboard.
+
+3. **Aptos API:**
+   - **Description:** The **Aptos API** is leveraged to retrieve voting data from DAOs across the blockchain.
+   - **Role in Project:** This API provides access to DAO voting records, which are essential for the analysis of participation trends and voting behaviors.
+
+4. **JavaScript (React.js):**
+   - **Description:** **React.js** is used for building the front-end of the application, providing an interactive and dynamic user interface.
+   - **Role in Project:** React.js helps in developing the dashboard where voting data, trends, and graphs are displayed in real-time.
+
+5. **Chart.js / D3.js:**
+   - **Description:** **Chart.js** and **D3.js** are JavaScript libraries used to create interactive charts and graphs.
+   - **Role in Project:** These libraries will be used for rendering pie charts and bar graphs that visually represent DAO voting patterns and trends.
+
+6. **Docker:**
+   - **Description:** **Docker** will be used for containerizing the application, ensuring it works seamlessly across different environments.
+   - **Role in Project:** Docker helps maintain consistency in development, testing, and deployment across various platforms.
+
+7. **Git/GitHub:**
+   - **Description:** **Git** is employed for version control, and **GitHub** is used for hosting and collaboration.
+   - **Role in Project:** Git and GitHub allow for smooth project management, enabling easy collaboration and version tracking.
+
+8. **HTML/CSS:**
+   - **Description:** **HTML5** and **CSS3** will be used to structure and style the front-end of the application.
+   - **Role in Project:** These will ensure the application has a clean, responsive design, working on both desktop and mobile.
