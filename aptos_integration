@@ -1,0 +1,14 @@
+import requests
+
+address = "0x1"  # ← you can replace this with any valid Aptos account address
+url = f"https://fullnode.devnet.aptoslabs.com/v1/accounts/{address}/resources"
+
+headers = {"Accept": "application/json, application/x-bcs"}
+
+response = requests.get(url, headers=headers)
+
+if response.status_code == 200:
+    print("Data fetched successfully:")
+    print(response.json())
+else:
+    print(f"Failed to fetch data. Status code: {response.status_code}")
