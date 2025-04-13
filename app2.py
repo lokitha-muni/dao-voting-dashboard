@@ -138,7 +138,10 @@ def update_data(contents, filename):
     return year_options, category_options, gender_options, kpi_cards, donut, bar, line, trend, df.to_dict('records')
 
 
-# Run app
-if __name__ == '__main__':
-    app.run(debug=True)
+import os
+
+# For deployment, bind to PORT from environment
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8050))  # fallback to 8050 for local
+    app.run(host="0.0.0.0", port=port)
 
