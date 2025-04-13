@@ -1,186 +1,144 @@
 import dash
-from dash import dcc, html, dash_table, Input, Output
+from dash import dcc, html, dash_table, Input, Output, State
 import pandas as pd
 import plotly.express as px
 import random
-
-# Generate mock DAO voting data
-def fetch_voting_data():
-    years = [2021, 2022, 2023]
-    dao_names = ["DAO1", "DAO2", "DAO3", "DAO4", "DAO5"]
-    categories = ["DeFi", "NFT", "Gaming", "Infrastructure", "Governance"]
-    data = []
-
-    for year in years:
-        for dao in dao_names:
-            for category in categories:
-                total_votes = random.randint(100, 1000)
-                male_votes = random.randint(0, total_votes)
-                female_votes = total_votes - male_votes
-                proposals = random.randint(5, 15)
-                data.append({
-                    "dao_name": dao,
-                    "votes": total_votes,
-                    "year": year,
-                    "category": category,
-                    "proposals": proposals,
-                    "participation_rate": round(random.uniform(40, 90), 2),
-                    "male_votes": male_votes,
-                    "female_votes": female_votes
-                })
-    return {"proposals": data}  # Wrap in dict to mimic API-style response
+import base64
+import io
 
 # Initialize Dash app
 app = dash.Dash(__name__)
 
-# Fetch data (use mock data temporarily)
-data = fetch_voting_data()
+# Initialize a global variable to hold the dataframe
+df = pd.DataFrame()
 
-# Ensure data is not empty or None
-if data and "proposals" in data:
-    df = pd.DataFrame(data["proposals"])
+# Layout with file upload feature
+app.layout = html.Div([
+    html.H1("DAO Voting Pattern Analyzer", style={'textAlign': 'center'}),
 
-    app.layout = html.Div([
-        html.H1("DAO Voting Pattern Analyzer", style={'textAlign': 'center'}),
-
-        # Filters
+    # File upload
+    dcc.Upload(
+        id='upload-data',
+        children=html.Button('Upload CSV'),
+        multiple=False
+    ),
+    
+    # Filters
+    html.Div([
         html.Div([
-            html.Div([
-                html.Label("Filter by Year"),
-                dcc.Dropdown(
-                    id='year-filter',
-                    options=[{"label": y, "value": y} for y in sorted(df['year'].unique())],
-                    multi=True,
-                    value=sorted(df['year'].unique())
-                )
-            ], style={'width': '30%', 'display': 'inline-block', 'padding': '0 10px'}),
-
-            html.Div([
-                html.Label("Filter by Category"),
-                dcc.Dropdown(
-                    id='category-filter',
-                    options=[{"label": c, "value": c} for c in sorted(df['category'].unique())],
-                    multi=True,
-                    value=sorted(df['category'].unique())
-                )
-            ], style={'width': '30%', 'display': 'inline-block', 'padding': '0 10px'}),
-
-            html.Div([
-                html.Label("Filter by Gender"),
-                dcc.Dropdown(
-                    id='gender-filter',
-                    options=[
-                        {"label": "All", "value": "All"},
-                        {"label": "Male", "value": "Male"},
-                        {"label": "Female", "value": "Female"}
-                    ],
-                    value="All",
-                    clearable=False
-                )
-            ], style={'width': '30%', 'display': 'inline-block', 'padding': '0 10px'}),
-        ], style={'padding': '20px'}),
-
-        # KPI Cards
-        html.Div(id='kpi-cards', style={'display': 'flex', 'justifyContent': 'space-around', 'padding': '20px'}),
-
-        # Charts
-        html.Div([
-            html.Div([
-                dcc.Graph(id='donut-participation')
-            ], style={'width': '32%', 'display': 'inline-block'}),
-
-            html.Div([
-                dcc.Graph(id='bar-votes')
-            ], style={'width': '32%', 'display': 'inline-block'}),
-
-            html.Div([
-                dcc.Graph(id='line-trend')
-            ], style={'width': '32%', 'display': 'inline-block'}),
-        ]),
+            html.Label("Filter by Year"),
+            dcc.Dropdown(id='year-filter', multi=True),
+        ], style={'width': '30%', 'display': 'inline-block', 'padding': '0 10px'}),
 
         html.Div([
-            dcc.Graph(id='key-metrics-trend')
-        ], style={'padding': '20px'}),
+            html.Label("Filter by Category"),
+            dcc.Dropdown(id='category-filter', multi=True),
+        ], style={'width': '30%', 'display': 'inline-block', 'padding': '0 10px'}),
 
-        # Data Table
         html.Div([
-            html.H3("Detailed DAO Proposal Data"),
-            dash_table.DataTable(
-                id='proposal-table',
-                columns=[{"name": i, "id": i} for i in df.columns],
-                style_table={'overflowX': 'auto'},
-                style_cell={'textAlign': 'center', 'padding': '5px'},
-                style_header={'fontWeight': 'bold', 'backgroundColor': '#f2f2f2'},
-                page_size=10
-            )
-        ], style={'padding': '20px'})
-    ])
+            html.Label("Filter by Gender"),
+            dcc.Dropdown(id='gender-filter', value="All", clearable=False),
+        ], style={'width': '30%', 'display': 'inline-block', 'padding': '0 10px'}),
+    ], style={'padding': '20px'}),
 
-    # Callback
-    @app.callback(
-        [Output('kpi-cards', 'children'),
-         Output('donut-participation', 'figure'),
-         Output('bar-votes', 'figure'),
-         Output('line-trend', 'figure'),
-         Output('key-metrics-trend', 'figure'),
-         Output('proposal-table', 'data')],
-        [Input('year-filter', 'value'),
-         Input('category-filter', 'value'),
-         Input('gender-filter', 'value')]
-    )
-    def update_dashboard(years, categories, gender):
-        dff = df[df['year'].isin(years) & df['category'].isin(categories)]
+    # KPI Cards
+    html.Div(id='kpi-cards', style={'display': 'flex', 'justifyContent': 'space-around', 'padding': '20px'}),
 
-        if gender == "Male":
-            dff = dff.assign(votes=dff['male_votes'])
-        elif gender == "Female":
-            dff = dff.assign(votes=dff['female_votes'])
+    # Charts
+    html.Div([
+        html.Div([dcc.Graph(id='donut-participation')], style={'width': '32%', 'display': 'inline-block'}),
+        html.Div([dcc.Graph(id='bar-votes')], style={'width': '32%', 'display': 'inline-block'}),
+        html.Div([dcc.Graph(id='line-trend')], style={'width': '32%', 'display': 'inline-block'}),
+    ]),
 
-        total_votes = dff['votes'].sum()
-        total_proposals = dff['proposals'].sum()
-        avg_participation = round(dff['participation_rate'].mean(), 2)
-        male_ratio = round((dff['male_votes'].sum() / dff[['male_votes', 'female_votes']].sum().sum()) * 100, 2)
-        female_ratio = 100 - male_ratio
+    # Trend Metrics
+    html.Div([dcc.Graph(id='key-metrics-trend')], style={'padding': '20px'}),
 
-        kpi_cards = [
-            html.Div([
-                html.H4("Total Votes"), html.H2(f"{total_votes}")
-            ], style={'padding': '10px', 'border': '1px solid #ccc', 'borderRadius': '10px', 'width': '20%', 'textAlign': 'center'}),
-            html.Div([
-                html.H4("Total Proposals"), html.H2(f"{total_proposals}")
-            ], style={'padding': '10px', 'border': '1px solid #ccc', 'borderRadius': '10px', 'width': '20%', 'textAlign': 'center'}),
-            html.Div([
-                html.H4("Avg Participation Rate"), html.H2(f"{avg_participation}%")
-            ], style={'padding': '10px', 'border': '1px solid #ccc', 'borderRadius': '10px', 'width': '20%', 'textAlign': 'center'}),
-            html.Div([
-                html.H4("Male vs Female"), html.H2(f"{male_ratio}% / {female_ratio}%")
-            ], style={'padding': '10px', 'border': '1px solid #ccc', 'borderRadius': '10px', 'width': '20%', 'textAlign': 'center'}),
-        ]
+    # Data Table
+    html.Div([html.H3("Detailed DAO Proposal Data"),
+              dash_table.DataTable(id='proposal-table', style_table={'overflowX': 'auto'},
+                                   style_cell={'textAlign': 'center', 'padding': '5px'},
+                                   style_header={'fontWeight': 'bold', 'backgroundColor': '#f2f2f2'},
+                                   page_size=10)
+              ], style={'padding': '20px'})
+])
 
-        donut = px.pie(names=["Male", "Female"], values=[dff['male_votes'].sum(), dff['female_votes'].sum()],
-                       hole=0.5, title="Participation by Gender")
 
-        bar = px.bar(dff, x='dao_name', y='votes', color='category', barmode='group', title="Votes per DAO")
+# Parse CSV content and update dataframe
+def parse_contents(contents):
+    content_type, content_string = contents.split(',')
+    decoded = base64.b64decode(content_string)
+    try:
+        # Try to read CSV
+        df = pd.read_csv(io.StringIO(decoded.decode('utf-8')))
+        return df
+    except Exception as e:
+        print(f"Error reading CSV: {e}")
+        return pd.DataFrame()
 
-        line = px.line(dff, x='year', y='votes', color='dao_name', markers=True, title="Voting Trend Over Years")
 
-        trend_df = dff.groupby('year', as_index=False).agg({
-            'participation_rate': 'mean',
-            'proposals': 'sum'
-        })
-        trend = px.line(trend_df, x='year', y=['participation_rate', 'proposals'], markers=True,
-                        title="Trend by Key Metrics")
+# Callback for file upload
+@app.callback(
+    [Output('year-filter', 'options'),
+     Output('category-filter', 'options'),
+     Output('gender-filter', 'options'),
+     Output('kpi-cards', 'children'),
+     Output('donut-participation', 'figure'),
+     Output('bar-votes', 'figure'),
+     Output('line-trend', 'figure'),
+     Output('key-metrics-trend', 'figure'),
+     Output('proposal-table', 'data')],
+    [Input('upload-data', 'contents')],
+    [State('upload-data', 'filename')]
+)
+def update_data(contents, filename):
+    global df
+    if contents is None:
+        return dash.no_update  # Don't update if no file uploaded
 
-        return kpi_cards, donut, bar, line, trend, dff.to_dict('records')
+    # Parse the contents of the uploaded file
+    df = parse_contents(contents)
 
-else:
-    app.layout = html.Div([
-        html.H1("No Data Available"),
-        html.P("Unable to fetch voting data from the API.")
-    ])
+    if df.empty:
+        return dash.no_update
+
+    # Update the filter options based on the CSV data
+    year_options = [{"label": str(year), "value": year} for year in sorted(df['year'].unique())]
+    category_options = [{"label": category, "value": category} for category in sorted(df['category'].unique())]
+    gender_options = [
+        {"label": "All", "value": "All"},
+        {"label": "Male", "value": "Male"},
+        {"label": "Female", "value": "Female"}
+    ]
+    
+    # Callback logic to update KPI cards and charts
+    total_votes = df['votes'].sum()
+    total_proposals = df['proposals'].sum()
+    avg_participation = round(df['participation_rate'].mean(), 2)
+    male_ratio = round((df['male_votes'].sum() / df[['male_votes', 'female_votes']].sum().sum()) * 100, 2)
+    female_ratio = 100 - male_ratio
+
+    kpi_cards = [
+        html.Div([html.H4("Total Votes"), html.H2(f"{total_votes}")], style={'padding': '10px', 'border': '1px solid #ccc', 'borderRadius': '10px', 'width': '20%', 'textAlign': 'center'}),
+        html.Div([html.H4("Total Proposals"), html.H2(f"{total_proposals}")], style={'padding': '10px', 'border': '1px solid #ccc', 'borderRadius': '10px', 'width': '20%', 'textAlign': 'center'}),
+        html.Div([html.H4("Avg Participation Rate"), html.H2(f"{avg_participation}%")], style={'padding': '10px', 'border': '1px solid #ccc', 'borderRadius': '10px', 'width': '20%', 'textAlign': 'center'}),
+        html.Div([html.H4("Male vs Female"), html.H2(f"{male_ratio}% / {female_ratio}%")], style={'padding': '10px', 'border': '1px solid #ccc', 'borderRadius': '10px', 'width': '20%', 'textAlign': 'center'}),
+    ]
+
+    donut = px.pie(names=["Male", "Female"], values=[df['male_votes'].sum(), df['female_votes'].sum()], hole=0.5, title="Participation by Gender")
+    bar = px.bar(df, x='dao_name', y='votes', color='category', barmode='group', title="Votes per DAO")
+    line = px.line(df, x='year', y='votes', color='dao_name', markers=True, title="Voting Trend Over Years")
+
+    trend_df = df.groupby('year', as_index=False).agg({
+        'participation_rate': 'mean',
+        'proposals': 'sum'
+    })
+    trend = px.line(trend_df, x='year', y=['participation_rate', 'proposals'], markers=True, title="Trend by Key Metrics")
+
+    return year_options, category_options, gender_options, kpi_cards, donut, bar, line, trend, df.to_dict('records')
+
 
 # Run app
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=80, debug=True)
-
+    app.run(debug=True)
 
