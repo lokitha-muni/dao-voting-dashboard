@@ -64,17 +64,23 @@ A Python Dash-based dashboard that fetches and visualizes DAO data from the Apto
 ## 🖼️ Screenshots
 
 ### Dashboard View
-![Screenshot 2025-04-13 060816](https://github.com/user-attachments/assets/a7cb4177-88be-464f-9ac6-1464b1be00cb)
-![Screenshot 2025-04-13 060902](https://github.com/user-attachments/assets/c71751e8-fdd9-445b-bb9b-b5348817cffb)
-![Screenshot 2025-04-13 060839](https://github.com/user-attachments/assets/aba11ac5-e1ab-478a-91ac-4b2d9418e483)
+
+## Data fetched by Aptos:
+![Screenshot 2025-04-13 164757](https://github.com/user-attachments/assets/084238c7-2ab1-4ed2-aaff-ed8173ff2031)
+![Screenshot 2025-04-13 164811](https://github.com/user-attachments/assets/19ea082d-1e0a-4901-af77-71ecdc6f5b81)
+
+## When you give your own csv file:
+![Screenshot 2025-04-13 165023](https://github.com/user-attachments/assets/f1f397e9-9719-44bb-bbeb-969c46455be1)
+![Screenshot 2025-04-13 165014](https://github.com/user-attachments/assets/23b56f3a-9b20-404e-a4fb-d2ac3c5b9798)
+![Screenshot 2025-04-13 164958](https://github.com/user-attachments/assets/741aa108-3486-4f7e-8630-7771131640fa)
+
 
 
 ### Landing Website (Local)
-![Screenshot 2025-04-13 062037](https://github.com/user-attachments/assets/100190bb-5d7b-43a0-b74e-04ff2b51d717)
-![Screenshot 2025-04-13 062010](https://github.com/user-attachments/assets/67b91f29-656d-4f09-8e85-e544f4abc4e9)
-![Screenshot 2025-04-13 061956](https://github.com/user-attachments/assets/9d457ff4-4060-43ee-9aa8-5e54bdd132a2)
-![Screenshot 2025-04-13 061941](https://github.com/user-attachments/assets/84500a3a-d3e5-4ce5-93df-808d59b5504c)
-
+![Screenshot 2025-04-13 165526](https://github.com/user-attachments/assets/46498bf4-8463-49d7-915e-260bfa440d7e)
+![Screenshot 2025-04-13 165614](https://github.com/user-attachments/assets/df854bcf-e219-4122-8ecc-e016e1553ade)
+![Screenshot 2025-04-13 165557](https://github.com/user-attachments/assets/32f6e3ee-8f95-43e7-8dc1-3c6087160ca8)
+![Screenshot 2025-04-13 165541](https://github.com/user-attachments/assets/e24cf98e-dfb2-4d08-809a-461911958cbc)
 
 ---
 
