@@ -6,6 +6,8 @@ This project analyzes DAO voting trends across the Aptos blockchain. It includes
 
 - 📊 **Dashboard:** [Explore the Full Dashboard][https://dao-voting-dashboard-azwk.onrender.com] 
 
+(Please wait for couple of minutes after clicking of "fetch Aptos data" since it takes few minutes fetch the data and visualise it)
+
 ---
 
 ## 🧩 Project Structure
